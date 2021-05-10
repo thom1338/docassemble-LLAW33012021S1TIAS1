@@ -63,7 +63,7 @@ code: |
     endpoints['ineligible']
 ---
 event: endpoints['final_screen']
-question: ""
+question: Thank you for using Tenny!
 subquestion:  |
  % if Lease_Type and Form_Type == 'Form 2':  
    % if Ground_Specified == 'Non-Payment of Rent':
@@ -71,10 +71,14 @@ subquestion:  |
   You have ${ interval.days } days to pay your outstanding rent.
   
   If you do not, you must give vacant possession to the landlord sometime immediately     thereafter.
+  
+  This will ultimately display whether the tenant was served the notice after 14 days     of not paying rent, as is required under the *Residential Tenancy Act*. The requisite   questions and calculations are already in place.
      % else:
   Your ${ Who_Tenant } has ${ interval.days } days to pay their outstanding rent.
   
   If your ${ Who_Tenant } does not, they must give vacant possession to the landlord     sometime immediately thereafter.
+  
+  This will ultimately display whether the tenant was served the notice after 14 days     of not paying rent, as is required under the *Residential Tenancy Act*. The requisite   questions and calculations are already in place.
      % endif
    % elif Ground_Specified == 'Other':
      % if Who_Tenant == 'User':
@@ -121,10 +125,10 @@ event: endpoints['ineligible']
 question: ""
 subquestion:  |
   % if User_Agree == False:
-    User_Disagree_Final_Screen
+    You must agree to the terms in order to proceed.
   % elif Lease_SA == False:
-    Lease_Not_SA_Final_Screen
+    Since this application considers only South Australia's Residential Tenancy Act,       the information provided only applies to leases of premises located in South           Australia.
   % elif Lease_Residential == False:
-    Lease_Not_Residential_Final_Screen
+    Ultimately, this screen will be tailored to the form of ineligible accomodation         that the user occupies so that it can direct them to more appropriate                   information/services.
   % endif
 ---
