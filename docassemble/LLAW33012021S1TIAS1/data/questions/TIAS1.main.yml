@@ -26,7 +26,7 @@ code: |
       Ground_Specified
       # If the breach of the tenancy agreement relied on by the landlord is 
       # non-payment of rent, then the notice period can only begin after rent
-      # is not paid for .... and ... 
+      # is not paid for 14 days and a notive period of 7 days is given
       if Ground_Specified == 'Non-Payment of Rent':
         Rent_Last_Paid
         Notice_Period = 7
@@ -52,6 +52,7 @@ code: |
     # upon expiry but only after providing 28 days notice. 
       if Without_Grounds_or_Certain_Purpose == 'No grounds specified':
         Lease_Expiry
+        Notice_Period = 28
     # Nonetheless, we do not believe this limb is redundant on the left 
     # (periodic) side of the flow chart as the user could still potentially 
     # be served such notice by the landlord, whether mistakenly or knowingly. 
@@ -64,13 +65,56 @@ code: |
 event: endpoints['final_screen']
 question: ""
 subquestion:  |
- # Need to insert an if statement here so that far left side of flow chart words
- # (i.e., Fixed, Form 3).
- ${ interval.days } days
-  % if Lease_Type and Form_Type == 'Form 2' and Ground_Specified != 'Non-Payment of Rent':
- ${ Until_Vacate.days } days
- % elif Lease_Type =='Lease_Fixed' and Form_Type == 'Form 3' and Without_Grounds_or_Certain_Purpose == 'No grounds specified':
- ${ Until_Expiry.days } days
+ % if Lease_Type and Form_Type == 'Form 2':  
+   % if Ground_Specified == 'Non-Payment of Rent':
+     % if Who_Tenant == 'User':
+  You have ${ interval.days } days to pay your outstanding rent.
+  
+  If you do not, you must give vacant possession to the landlord sometime immediately     thereafter.
+     % else:
+  Your ${ Who_Tenant } has ${ interval.days } days to pay their outstanding rent.
+  
+  If your ${ Who_Tenant } does not, they must give vacant possession to the landlord     sometime immediately thereafter.
+     % endif
+   % elif Ground_Specified == 'Other':
+     % if Who_Tenant == 'User':
+  You have ${ interval.days } days to remedy the alleged breach of your lease.
+  
+  After that time, if you have not remedied this alleged breach, you will have a furter   ${ Vacate_Period } days to give vacanct possession to the landlord.
+     % else:
+  Your ${ Who_Tenant } has ${ interval.days } days to remedy the alleged breach of       their lease.
+  
+  After that time, if your ${ Who_Tenant } has not remedied this alleged breach, they     will have a further ${ Vacate_Period } days to give vacanct possession to the           landlord.
+    % endif
+   % endif
+ % elif Lease_Type == 'Lease_Periodic' and Form_Type == 'Form 3':
+     % if Without_Grounds_or_Certain_Purpose == 'No grounds specified':
+       % if Who_Tenant == 'User':
+   You have ${ interval.days } days remaining before you must give vacant possession to    the landlord.
+       % else:
+   Your ${ Who_Tenant } has ${ interval.days } days remaining before they must give        vacant posession to the landlord.
+       % endif
+     % else:
+       % if Who_Tenant == 'User':
+   You have ${ interval.days } days remaining before you must give vacant possession to    the landlord.
+       % else:
+   Your ${ Who_Tenant } has ${ interval.days } days remaining before they must give        vacant posession to the landlord.
+       % endif
+     % endif
+ % elif Lease_Type == 'Lease_Fixed' and Form_Type == 'Form 3':
+   % if Without_Grounds_or_Certain_Purpose == 'No grounds specified':
+     % if Who_Tenant == 'User':
+   Your landlord can terminate your lease upon expiry only after giving ${                Notice_Period } days notice.  
+     % else:
+   The landlord can terminate your ${ Who_Tenant }'s lease upon expiry only after          giving ${ Notice_Period } days notice. 
+     % endif
+   % else:
+     % if Who_Tenant == 'User':
+   Your landlord cannot terminate your fixed lease because they require possession of      the premises for a certain purpose.
+     % else:
+   Your landlord cannot terminate your ${ Who_Tenant }'s fixed lease because they          require possession of the premises for a certain purpose.
+     % endif
+   % endif
  % endif
 ---
 event: endpoints['ineligible']
